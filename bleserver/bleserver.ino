@@ -10,6 +10,16 @@ static BLECharacteristic *pm10Characteristic;
 static BLECharacteristic *pm2_5Characteristic;
 static BLECharacteristic *pm1_0Characteristic;
 
+// creates a new user descriptor and adds it to the characteristic
+static BLEDescriptor *addStringDescriptor(BLECharacteristic * characteristic, const char *uuid,
+                                          const char *value)
+{
+    BLEDescriptor *descriptor = new BLEDescriptor(uuid);
+    descriptor->setValue(value);
+    characteristic->addDescriptor(descriptor);
+    return descriptor;
+}
+
 void setup(void)
 {
     Serial.begin(115200);
@@ -19,15 +29,23 @@ void setup(void)
     BLEServer *pServer = BLEDevice::createServer();
     BLEService *pService = pServer->createService("181A");
 
+    // PM10
     pm10Characteristic = pService->createCharacteristic("28D5",
                                                         BLECharacteristic::PROPERTY_READ |
                                                         BLECharacteristic::PROPERTY_NOTIFY);
+    addStringDescriptor(pm10Characteristic, "2901", "PM10");
+
+    // PM2.5
     pm2_5Characteristic = pService->createCharacteristic("28D6",
                                                          BLECharacteristic::PROPERTY_READ |
                                                          BLECharacteristic::PROPERTY_NOTIFY);
+    addStringDescriptor(pm2_5Characteristic, "2901", "PM2.5");
+
+    // PM1.0
     pm1_0Characteristic = pService->createCharacteristic("28D7",
                                                          BLECharacteristic::PROPERTY_READ |
                                                          BLECharacteristic::PROPERTY_NOTIFY);
+    addStringDescriptor(pm1_0Characteristic, "2901", "PM1.0");
 
     pService->start();
 
